@@ -106,7 +106,10 @@ export default function ChessInterface() {
   }
 
   function onDrop(sourceSquare: string, targetSquare: string) {
-    if (isViewingHistory) return false
+    if (isViewingHistory && !(currentMoveIndex === moveHistory.length - 1)) {
+      return false
+    } 
+      
     
     const move = {
       from: sourceSquare,
@@ -371,7 +374,7 @@ export default function ChessInterface() {
           >
               {showContinueButton && (
                 <Button onClick={continueFromHere} className="w-full">
-                  Continue from Here
+                  
                 </Button>
               )}
           </MoveHistory>
