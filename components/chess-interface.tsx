@@ -374,7 +374,7 @@ export default function ChessInterface() {
           >
               {showContinueButton && (
                 <Button onClick={continueFromHere} className="w-full">
-                  
+                  Continue Engine from Here
                 </Button>
               )}
           </MoveHistory>
