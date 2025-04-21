@@ -1,4 +1,5 @@
 import { Chess } from "chess.js";
+import { waitForDebugger } from "inspector";
 
 export const Engines = [
     {
@@ -75,8 +76,13 @@ export class ChessEngine {
 function randomSearch(game: Chess, depth: number) {
         const moves = game.moves();
         const randomIndex = Math.floor(Math.random() * moves.length);
+        sleep(2000)
         return moves[randomIndex];
 }
+
+function sleep(ms:number) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+  }
 
 function randomEvaluation(game: Chess) {
     return Math.floor(Math.random() * 2001) - 1000;

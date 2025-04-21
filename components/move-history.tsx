@@ -19,6 +19,7 @@ export default function MoveHistory({ moves, currentMoveIndex, onSelectMove, chi
   }
 
   return (
+    <div>
     <div className="overflow-y-auto max-h-[340px] border rounded">
       <table className="w-full">
         <thead>
@@ -52,6 +53,7 @@ export default function MoveHistory({ moves, currentMoveIndex, onSelectMove, chi
           ))}
         </tbody>
       </table>
+    </div>
       <div className="p-2 flex justify-between w-full">
         {children}
        
