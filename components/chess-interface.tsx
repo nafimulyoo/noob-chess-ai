@@ -97,20 +97,53 @@ export default function ChessInterface() {
     setEvaluation(Engine.getEvaluation(game))
 
     if (!isViewingHistory && game.turn() !== orientation[0]) {
-      const bestMove = Engine.getBestMove(game)
-      if (bestMove) {
-        makeAMove(bestMove)
-      }
+      Engine.getBestMove(game).then(bestMove => {
+        if (bestMove) {
+          makeAMove(bestMove)
+        }
+      })
     }
-
   }, [game, orientation])
 
-  function handleGameOver(game: Chess) {
+  function checkThreeFoldRepetition(history: string[]): boolean {
+      // Create a new temporary game to replay all moves
+      const tempGame = new Chess();
+      const positionCounts: Record<string, number> = {};
+      
+      // Count the initial position
+      positionCounts[tempGame.fen()] = 1;
+    
+      // Replay all moves and count positions
+      for (const move of history) {
+        tempGame.move(move);
+        const currentFen = tempGame.fen().split(' ').slice(0, 4).join(' '); // We only care about piece positions, turn, castling, and en passant
+        
+        if (positionCounts[currentFen]) {
+          positionCounts[currentFen]++;
+        } else {
+          positionCounts[currentFen] = 1;
+        }
+    
+        if (positionCounts[currentFen] >= 3) {
+          return true;
+        }
+      }
+    
+      return false;
+    }
+  
+
+  function handleGameOver(game: Chess, history: any) {
+    if (checkThreeFoldRepetition(history)) {
+      setGameOverMessage("Draw by Threefold Repetition")
+      setShowGameOverModal(true)
+    }
     if (game.isCheckmate()) {
       const winner = game.turn() === 'w' ? 'Black' : 'White'
       const isPlayerWinner = (winner === 'White' && orientation === 'white') || 
                           (winner === 'Black' && orientation === 'black')
       setGameOverMessage(isPlayerWinner ? "You Win!" : "You Lose!")
+      setShowGameOverModal(true)
     } 
     else if (game.isDraw()) {
       if (game.isInsufficientMaterial()) {
@@ -118,9 +151,7 @@ export default function ChessInterface() {
       }
       else if (game.isStalemate()) {
         setGameOverMessage("Draw by Stalemate")
-      }
-      else if (game.isThreefoldRepetition()) {
-        setGameOverMessage("Draw by Threefold Repetition")
+        setShowGameOverModal(true)
       }
       else if (game.isDrawByFiftyMoves()) {
         setGameOverMessage("Draw by Fifty Moves Rule")
@@ -129,11 +160,6 @@ export default function ChessInterface() {
         setGameOverMessage("Draw")
       }
     } 
-    else if (game.isStalemate()) {
-      setGameOverMessage("Draw by Stalemate")
-    }
-
-    setShowGameOverModal(true)
   }
 
   function makeAMove(move: any) {
@@ -153,33 +179,32 @@ export default function ChessInterface() {
   
       if (result) {
         // Clear any existing move highlights first
-        setMoveSquares({})
         
-        // Force a small delay to allow the animation to trigger
-          setGame(gameCopy)
-          setFen(gameCopy.fen())
-          setSelectedSquare(null)
-          setOptionSquares({})
-  
-          // Highlight the last move
-          setMoveSquares({
-            [move.from]: { backgroundColor: 'rgba(255, 255, 0, 0.4)' },
-            [move.to]: { backgroundColor: 'rgba(255, 255, 0, 0.4)' }
-          })
-  
-          if (gameCopy.isGameOver()) {
-            handleGameOver(gameCopy)
-          }
-  
-          // Update move history
-          const newHistory = [...moveHistory]
-          if (currentMoveIndex < moveHistory.length - 1) {
-            newHistory.splice(currentMoveIndex + 1)
-          }
-          newHistory.push(result.san)
-          setMoveHistory(newHistory)
-          setCurrentMoveIndex(newHistory.length - 1)
-  
+        setMoveSquares({})
+
+        setGame(gameCopy)
+        setFen(gameCopy.fen())
+        setSelectedSquare(null)
+        setOptionSquares({})
+        
+        // Highlight the last move
+        setMoveSquares({
+          [move.from]: { backgroundColor: 'rgba(255, 255, 0, 0.4)' },
+          [move.to]: { backgroundColor: 'rgba(255, 255, 0, 0.4)' }
+        })
+        
+        
+        // Update move history
+        const newHistory = [...moveHistory]
+        if (currentMoveIndex < moveHistory.length - 1) {
+          newHistory.splice(currentMoveIndex + 1)
+        }
+        newHistory.push(result.san)
+        setMoveHistory(newHistory)
+        setCurrentMoveIndex(newHistory.length - 1)
+        
+        handleGameOver(gameCopy, newHistory)
+
         return true
       }
     } catch (error) {
@@ -192,12 +217,12 @@ export default function ChessInterface() {
     const move = {
       from: sourceSquare,
       to: targetSquare,
-      promotion: 'q' // default to queen
+      promotion: 'q' 
     }
 
     setIsViewingHistory(false)
-    
-    return makeAMove(move)
+    const moved = makeAMove(move)
+    return moved
   }
 
   function onSquareClick(square: Square) {
@@ -402,7 +427,7 @@ export default function ChessInterface() {
     
     // If it's now the AI's turn, make it move
     if (game.turn() !== orientation[0]) {
-      const bestMove = setTimeout((game) => Engine.getBestMove(game), 300)
+      const bestMove = Engine.getBestMove(game)
       if (bestMove) {
         makeAMove(bestMove)
       }
