@@ -2,6 +2,7 @@
 
 import { useState, useEffect, use } from "react"
 import { Chess, Square } from "chess.js"
+import { motion, AnimatePresence } from "framer-motion";
 import { Chessboard } from "react-chessboard"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Button } from "@/components/ui/button"
@@ -132,6 +133,10 @@ export default function ChessInterface() {
       return false;
     }
   
+  const variants = {
+      hidden: { opacity: 0 },
+      visible: { opacity: 1 },
+    };
 
   function handleGameOver(game: Chess, history: any) {
     if (checkThreeFoldRepetition(history)) {
@@ -163,7 +168,13 @@ export default function ChessInterface() {
   }
 
   function makeAMove(move: any) {
+    if (checkThreeFoldRepetition(moveHistory)) {
+      return false
+    }
+    
+    
     try {
+      console.log("MAKING MOVE")
       const gameCopy = new Chess(game.fen())
       // Check if it's a pawn promotion
       const piece = gameCopy.get(move.from)
@@ -175,6 +186,8 @@ export default function ChessInterface() {
           move.promotion = 'q'
         }
       }
+
+      console.log(move)
       const result = gameCopy.move(move)
   
       if (result) {
@@ -421,16 +434,18 @@ export default function ChessInterface() {
     }
   }
 
-  function continueFromHere() {
-    setIsViewingHistory(false)
+  async function continueFromHere() {
     setShowContinueButton(false)
+    setIsViewingHistory(false)
     
     // If it's now the AI's turn, make it move
     if (game.turn() !== orientation[0]) {
-      const bestMove = Engine.getBestMove(game)
-      if (bestMove) {
-        makeAMove(bestMove)
-      }
+      Engine.getBestMove(game).then(bestMove => {
+        if (bestMove) {
+          console.log(bestMove)
+          makeAMove(bestMove)
+        }
+      })
     }
   }
 
@@ -637,9 +652,18 @@ export default function ChessInterface() {
             }}
           >
               {showContinueButton && (
+                  <motion.div
+                  className="w-full"
+                  variants={variants}
+                  initial="hidden"
+                  animate="visible"
+                  exit="hidden"
+                  transition={{ duration: 0.5, ease: "easeInOut" }} // Adjust duration and ease
+                >
                 <Button onClick={continueFromHere} className="w-full">
                   Continue Engine from Here
                 </Button>
+            </motion.div>
               )}
           </MoveHistory>
         </div>

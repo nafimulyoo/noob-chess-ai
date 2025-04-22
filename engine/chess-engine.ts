@@ -90,8 +90,9 @@ function randomSearch(game: Chess, depth: number) {
   const moves = game.moves({verbose: true})
 
   const randomIndex = Math.floor(Math.random() * moves.length)
-  const selectedMove = moves[randomIndex]
-  return { selectedMove }
+  const selectedMove = Object.assign({}, moves[randomIndex])
+  console.log("P")
+  return selectedMove
 }
 
 function randomEvaluation(game: Chess) {
