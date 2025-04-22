@@ -452,7 +452,7 @@ export default function ChessInterface() {
 
   // Custom board colors
   const customBoardStyle = {
-    boxShadow: "0 2px 10px rgba(0, 0, 0, 0.2)",
+    // boxShadow: "0 2px 10px rgba(0, 0, 0, 0.2)",
   }
   
   const customLightSquareStyle = { backgroundColor: '#e9eae7' }
@@ -486,7 +486,7 @@ export default function ChessInterface() {
       {/* Left column - Engine settings and player info */}
       <div className="flex flex-col gap-4 lg:col-span-1">
       <div className="items-center justify-center mb-1">
-      <div className="flex items-center justify-center flex-col">
+      <div className="flex items-center justify-center flex-col md:mt-0 mt-12">
         <Cpu className="w-16 h-16 -pb-1 mb-2"/>
         <div className="text-3xl font-bold mb-2 text-center"> NoobChess</div>
       </div>
@@ -600,6 +600,7 @@ export default function ChessInterface() {
             height: "auto", // Maintain aspect ratio
             aspectRatio: "1/1" // Force square aspect
           }}
+          arePremovesAllowed={true}
           customLightSquareStyle={customLightSquareStyle}
           customDarkSquareStyle={customDarkSquareStyle}
           customSquareStyles={{
