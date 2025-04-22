@@ -27,9 +27,9 @@ export default function ChessInterface() {
   const [orientation, setOrientation] : any = useState("white")
   const [moveHistory, setMoveHistory] = useState<string[]>([])
   const [currentMoveIndex, setCurrentMoveIndex] = useState(-1)
-  const [evaluation, setEvaluation] = useState(2)
-  const [selectedEngine, setSelectedEngine] = useState("random")
-  const [depth, setDepth] = useState(15)
+  const [evaluation, setEvaluation] = useState(0)
+  const [selectedEngine, setSelectedEngine] = useState("minimax")
+  const [depth, setDepth] = useState(3)
   const [Engine, setEngine] = useState<ChessEngine>(new ChessEngine(selectedEngine, depth))
   const [showGameOverModal, setShowGameOverModal] = useState(false)
   const [gameOverMessage, setGameOverMessage] = useState("")
@@ -43,8 +43,10 @@ export default function ChessInterface() {
   useEffect(() => {
     Engine.setEngine(selectedEngine)
     Engine.setSearchDepth(depth)
-    setEvaluation(Engine.getEvaluation(game))
-  }, [selectedEngine, depth])
+    Engine.getEvaluationBar(game).then((newEvalution: any) => {
+      setEvaluation(newEvalution)
+    })
+  }, [selectedEngine, depth, orientation])
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -96,16 +98,21 @@ export default function ChessInterface() {
   }, [currentMoveIndex, moveHistory.length]); 
   
   useEffect(() => {
-    setEvaluation(Engine.getEvaluation(game))
+    
 
     if (!isViewingHistory && game.turn() !== orientation[0]) {
-      Engine.getBestMove(game).then(bestMove => {
-        if (bestMove) {
-          makeAMove(bestMove)
+      if (game.isGameOver()) {
+        handleGameOver(game, moveHistory)
+        return
+      }
+      Engine.getMovesOptionsEvaluated(game).then((moveOptions: any) => {
+        if (moveOptions.bestMove.move) {
+          makeAMove(moveOptions.bestMove.move)
         }
       })
     }
   }, [game, orientation])
+
 
   function checkThreeFoldRepetition(history: string[]): boolean {
       // Create a new temporary game to replay all moves
@@ -175,7 +182,6 @@ export default function ChessInterface() {
     
     
     try {
-      console.log("MAKING MOVE")
       const gameCopy = new Chess(game.fen())
       // Check if it's a pawn promotion
       const piece = gameCopy.get(move.from)
@@ -188,11 +194,13 @@ export default function ChessInterface() {
         }
       }
 
-      console.log(move)
       const result = gameCopy.move(move)
   
       if (result) {
         // Clear any existing move highlights first
+        Engine.getEvaluationBar(game).then((newEvalution: any) => {
+          setEvaluation(newEvalution)
+        })
         
         setMoveSquares({})
 
@@ -200,6 +208,8 @@ export default function ChessInterface() {
         setFen(gameCopy.fen())
         setSelectedSquare(null)
         setOptionSquares({})
+        
+        
         
         // Highlight the last move
         setMoveSquares({
@@ -213,11 +223,13 @@ export default function ChessInterface() {
         if (currentMoveIndex < moveHistory.length - 1) {
           newHistory.splice(currentMoveIndex + 1)
         }
+        
         newHistory.push(result.san)
         setMoveHistory(newHistory)
         setCurrentMoveIndex(newHistory.length - 1)
         
         handleGameOver(gameCopy, newHistory)
+
 
         return true
       }
@@ -236,6 +248,7 @@ export default function ChessInterface() {
 
     setIsViewingHistory(false)
     const moved = makeAMove(move)
+
     return moved
   }
 
@@ -441,10 +454,9 @@ export default function ChessInterface() {
     
     // If it's now the AI's turn, make it move
     if (game.turn() !== orientation[0]) {
-      Engine.getBestMove(game).then(bestMove => {
-        if (bestMove) {
-          console.log(bestMove)
-          makeAMove(bestMove)
+      Engine.getMovesOptionsEvaluated(game).then((moveOptions: any) => {
+        if (moveOptions.bestMove.move) {
+          makeAMove(moveOptions.bestMove.move)
         }
       })
     }
@@ -521,7 +533,7 @@ export default function ChessInterface() {
                 Engines.find(e => e.id === selectedEngine)?.depthSettingAvailable ? (
                   <div>
                     <label className="block text-sm font-medium my-2">Search Depth: {depth}</label>
-                    <Slider value={[depth]} min={1} max={30} step={1} onValueChange={(value) => setDepth(value[0])} />
+                    <Slider value={[depth]} min={1} max={3} step={1} onValueChange={(value) => setDepth(value[0])} />
                   </div>
                 ) : (
                   <label className="block text-sm font-medium mb-1">Search Depth is Not Adjustable</label>
@@ -600,7 +612,7 @@ export default function ChessInterface() {
             height: "auto", // Maintain aspect ratio
             aspectRatio: "1/1" // Force square aspect
           }}
-          arePremovesAllowed={true}
+          // arePremovesAllowed={true}
           customLightSquareStyle={customLightSquareStyle}
           customDarkSquareStyle={customDarkSquareStyle}
           customSquareStyles={{
