@@ -98,6 +98,9 @@ export default function ChessInterface() {
   }, [currentMoveIndex, moveHistory.length]); 
   
   useEffect(() => {
+    Engine.getEvaluationBar(game).then((newEvalution: any) => {
+      setEvaluation(newEvalution)
+    })
     
 
     if (!isViewingHistory && game.turn() !== orientation[0]) {
@@ -198,9 +201,6 @@ export default function ChessInterface() {
   
       if (result) {
         // Clear any existing move highlights first
-        Engine.getEvaluationBar(game).then((newEvalution: any) => {
-          setEvaluation(newEvalution)
-        })
         
         setMoveSquares({})
 

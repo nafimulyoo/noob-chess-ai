@@ -7,7 +7,7 @@ interface EvaluationBarProps {
 
 export default function EvaluationBar({ evaluation, orientation }: EvaluationBarProps) {
   // Convert evaluation to a percentage (capped at ±5)
-  const normalizedEval = Math.max(Math.min(evaluation, 1000), -1000) / 1000 // Normalize to -1 to 1
+  const normalizedEval = Math.max(Math.min(evaluation, 1000), -1000) / 100   // Normalize to -1 to 1
 
   // Calculate percentage for the bar (50% is equal)
   let percentage = 50 + normalizedEval * 10 // 10% per pawn of advantage
