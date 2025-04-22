@@ -24,9 +24,9 @@ export default function MoveHistory({ moves, currentMoveIndex, onSelectMove, chi
       <table className="w-full">
         <thead>
           <tr className="bg-gray-100 dark:bg-gray-700">
-            <th className="py-2 px-3 text-left w-[20%]">#</th>
-            <th className="py-2 px-3 text-left w-[40%]">White</th>
-            <th className="py-2 px-3 text-left w-[40%]">Black</th>
+            <th className="py-2 px-3 text-left text-sm w-[20%]">#</th>
+            <th className="py-2 px-3 text-left text-sm w-[40%]">White</th>
+            <th className="py-2 px-3 text-left text-sm w-[40%]">Black</th>
           </tr>
         </thead>
         <tbody>

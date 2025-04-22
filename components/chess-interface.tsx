@@ -10,6 +10,7 @@ import { Slider } from "@/components/ui/slider"
 import { RotateCcw, RotateCw, ChevronLeft, ChevronRight, Clock, User } from "lucide-react"
 import EvaluationBar from "@/components/evaluation-bar"
 import MoveHistory from "@/components/move-history"
+import { Cpu } from "lucide-react"
 import { Engines, ChessEngine } from "@/engine/chess-engine"
 import {
   Dialog,
@@ -451,7 +452,6 @@ export default function ChessInterface() {
 
   // Custom board colors
   const customBoardStyle = {
-    borderRadius: "4px",
     boxShadow: "0 2px 10px rgba(0, 0, 0, 0.2)",
   }
   
@@ -459,7 +459,7 @@ export default function ChessInterface() {
   const customDarkSquareStyle = { backgroundColor: '#4b7399' }
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+    <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 w-full">
        <Dialog open={showGameOverModal} onOpenChange={setShowGameOverModal}>
         <DialogContent>
           <DialogHeader>
@@ -485,13 +485,24 @@ export default function ChessInterface() {
       </Dialog>
       {/* Left column - Engine settings and player info */}
       <div className="flex flex-col gap-4 lg:col-span-1">
+      <div className="items-center justify-center mb-1">
+      <div className="flex items-center justify-center flex-col">
+        <Cpu className="w-16 h-16 -pb-1 mb-2"/>
+        <div className="text-3xl font-bold mb-2 text-center"> NoobChess</div>
+      </div>
+        <div>
+        <p className="flex items-center justify-center text-center text-sm">
+          <span>A simple chess AI built with Next.js and React. Made by Nafi karena demot ngerjain TA.{" "}<a href="https://github.com/nafimulyoo/noob-chess-ai" className="underline font-bold ml-2">{"Source Code"}</a></span>
+        </p>
+        </div>
+      </div>
         <div className="bg-white dark:bg-gray-800 rounded-lg p-4 shadow">
           <h2 className="text-lg font-semibold mb-3">Engine Settings</h2>
 
           <div className="space-y-4">
-            <div>
+            <div className="">
               <label className="block text-sm font-medium mb-1">Engine</label>
-              <Select value={selectedEngine} onValueChange={setSelectedEngine}>
+              <Select value={selectedEngine} onValueChange={setSelectedEngine} >
                 <SelectTrigger>
                   <SelectValue placeholder="Select engine" />
                 </SelectTrigger>
@@ -569,59 +580,72 @@ export default function ChessInterface() {
 
       {/* Center column - Chess board and controls */}
       <div className="flex flex-col gap-4 lg:col-span-2">
-        <div className="relative bg-white dark:bg-gray-800 rounded-lg p-4 shadow">
-          <div className="flex">
-            <div className="w-full">
-              <Chessboard
-                position={fen}
-                onPieceDrop={onDrop}
-                animationDuration={300}
-                onSquareClick={onSquareClick}
-                onSquareRightClick={onSquareRightClick}
-                onPieceDragBegin={onPieceDragBegin}
-                onPieceDragEnd={onPieceDragEnd}
-                boardOrientation={orientation}
-                customBoardStyle={customBoardStyle}
-                customLightSquareStyle={customLightSquareStyle}
-                customDarkSquareStyle={customDarkSquareStyle}
-                customSquareStyles={{
-                  ...moveSquares,
-                  ...optionSquares,
-                  ...rightClickedSquares
-                }}
-              />
-            </div>
-            <div className="w-6 ml-2">
-              <EvaluationBar evaluation={evaluation} orientation={orientation} />
-            </div>
-          </div>
-
-          <div className="flex justify-between mt-4 lg:col-span-1">
-            <div className="flex gap-2">
-              <Button variant="outline" size="icon" onClick={() => navigateMove(-1)} disabled={currentMoveIndex < 0}>
-                <ChevronLeft className="h-4 w-4" />
-              </Button>
-              <Button
-                variant="outline"
-                size="icon"
-                onClick={() => navigateMove(1)}
-                disabled={currentMoveIndex >= moveHistory.length - 1}
-              >
-                <ChevronRight className="h-4 w-4" />
-              </Button>
-            </div>
-
-            <div className="flex gap-2">
-              <Button variant="outline" size="icon" onClick={flipBoard} className="w-40">
-                Switch Position <RotateCw className="h-4 w-4" />
-              </Button>
-              <Button variant="outline" size="icon" onClick={resetBoard} className="w-36">
-                Reset Game <RotateCcw className="h-4 w-4" />
-              </Button>
-            </div>
-          </div>
-        </div>
+  <div className="relative bg-white dark:bg-gray-800 rounded-lg p-4 shadow">
+    {/* Chessboard + Eval Bar Container */}
+    <div className="flex flex-row w-full">
+      {/* Chessboard (flexible width) */}
+      <div className="flex-1 min-w-0"> {/* Allows shrinking if needed */}
+        <Chessboard
+          position={fen}
+          onPieceDrop={onDrop}
+          animationDuration={300}
+          onSquareClick={onSquareClick}
+          onSquareRightClick={onSquareRightClick}
+          onPieceDragBegin={onPieceDragBegin}
+          onPieceDragEnd={onPieceDragEnd}
+          boardOrientation={orientation}
+          customBoardStyle={{
+            ...customBoardStyle,
+            width: "100%", // Ensure board fills container
+            height: "auto", // Maintain aspect ratio
+            aspectRatio: "1/1" // Force square aspect
+          }}
+          customLightSquareStyle={customLightSquareStyle}
+          customDarkSquareStyle={customDarkSquareStyle}
+          customSquareStyles={{
+            ...moveSquares,
+            ...optionSquares,
+            ...rightClickedSquares
+          }}
+        />
       </div>
+      
+      <div className="ml-2 w-4 sm:w-2 md:w-4 lg:w-6 xl:w-8 flex-shrink-0 "> 
+        <EvaluationBar evaluation={evaluation} orientation={orientation} />
+      </div>
+    </div>
+
+    <div className="flex flex-wrap items-center justify-between mt-4 gap-2">
+      <div className="flex gap-2">
+        <Button variant="outline" size="icon" onClick={flipBoard} className="w-24">
+          Switch <RotateCw className="h-4 w-4" />
+        </Button>
+        <Button variant="outline" size="icon" onClick={resetBoard} className="w-24">
+          Reset <RotateCcw className="h-4 w-4" />
+        </Button>
+      </div>
+      
+      <div className="flex gap-2">
+        <Button 
+          variant="outline" 
+          size="icon" 
+          onClick={() => navigateMove(-1)} 
+          disabled={currentMoveIndex < 0}
+        >
+          <ChevronLeft className="h-4 w-4" />
+        </Button>
+        <Button
+          variant="outline"
+          size="icon"
+          onClick={() => navigateMove(1)}
+          disabled={currentMoveIndex >= moveHistory.length - 1}
+        >
+          <ChevronRight className="h-4 w-4" />
+        </Button>
+      </div>
+    </div>
+  </div>
+</div>
 
       {/* Right column - Move history and evaluation */}
       <div className="flex flex-col gap-4">
