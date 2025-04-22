@@ -158,10 +158,12 @@ export default function ChessInterface() {
       const winner = game.turn() === 'w' ? 'Black' : 'White'
       const isPlayerWinner = (winner === 'White' && orientation === 'white') || 
                           (winner === 'Black' && orientation === 'black')
+      setEvaluation(winner === "White" ? 10000 : -10000)
       setGameOverMessage(isPlayerWinner ? "You Win!" : "You Lose!")
       setShowGameOverModal(true)
     } 
     else if (game.isDraw()) {
+      setEvaluation(0)
       if (game.isInsufficientMaterial()) {
         setGameOverMessage("Draw by Insufficient Material")
       }

@@ -163,8 +163,5 @@ export const PAWN_STRUCTURE_VALUE = {
 }
 
 export const MOBILITY_VALUE = {
-  default: 10,
-  opening: 10,
-  middlegame: 10,
-  endgame: 10,
+  default: 1,
 }

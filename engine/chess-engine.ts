@@ -325,7 +325,7 @@ function handcraftedEvaluation(
   isEvaluatePieceCount: boolean = true,
   isEvaluatePiecePosition: boolean = true,
   isEvaluateMobility: boolean = true,
-  isEvaluatePawnStructure: boolean = true,
+  isEvaluatePawnStructure: boolean = false,
 
   customPhase: any = {
     gameSplit: GAME_SPLIT,
