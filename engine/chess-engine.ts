@@ -344,16 +344,16 @@ function handcraftedEvaluation(
     console.log("Piece Position Evaluation: ", piecePositionEvaluation)
     evaluation += piecePositionEvaluation
   }
-  // if (isEvaluateMobility) {
-  //   const mobilityEvaluation = evaluateMobility(game, customPhase)
-  //   console.log("Mobility Evaluation: ", mobilityEvaluation)
-  //   evaluation += mobilityEvaluation
-  // }
-  // if (isEvaluatePawnStructure) {
-  //   const pawnStructureEvaluation = evaluatePawnStructure(game, customPhase)
-  //   console.log("Pawn Structure Evaluation: ", pawnStructureEvaluation)
-  //   evaluation += pawnStructureEvaluation
-  // }
+  if (isEvaluateMobility) {
+    const mobilityEvaluation = evaluateMobility(game, customPhase)
+    console.log("Mobility Evaluation: ", mobilityEvaluation)
+    evaluation += mobilityEvaluation
+  }
+  if (isEvaluatePawnStructure) {
+    const pawnStructureEvaluation = evaluatePawnStructure(game, customPhase)
+    console.log("Pawn Structure Evaluation: ", pawnStructureEvaluation)
+    evaluation += pawnStructureEvaluation
+  }
   console.log("Total Evaluation: ", evaluation)
   console.log("===================================")
   return evaluation
