@@ -197,7 +197,6 @@ function oneDepthBestMoveSearch(
     searchResult.bestMove = searchResult.bestMoves[randomIndex];
   }
 
-  console.log("movesEvaluated by One Depth", searchResult);
   return searchResult;
 }
 
@@ -277,7 +276,6 @@ function minimaxSearch(
     const gameCopy = new Chess(game.fen());
     const turn = gameCopy.turn()
     gameCopy.move(move.san);
-    console.log("move", move)
     let evaluation = 0;
     if (turn == "b") {
       evaluation = maxi(gameCopy, depth - 1, evaluationAlgorithm)*eval_turn_multiplier
@@ -286,7 +284,6 @@ function minimaxSearch(
       evaluation = mini(gameCopy, depth - 1, evaluationAlgorithm)*eval_turn_multiplier
     }
 
-    console.log("Evaluation", evaluation)
     const moveCopy = Object.assign({}, move);
 
     searchResult.movesEvaluated.push({ move: moveCopy, evaluation });
@@ -325,7 +322,7 @@ function handcraftedEvaluation(
   isEvaluatePieceCount: boolean = true,
   isEvaluatePiecePosition: boolean = true,
   isEvaluateMobility: boolean = true,
-  isEvaluatePawnStructure: boolean = false,
+  isEvaluatePawnStructure: boolean = true,
 
   customPhase: any = {
     gameSplit: GAME_SPLIT,
@@ -335,18 +332,29 @@ function handcraftedEvaluation(
   }
 ) {
   let evaluation = 0
-
+  console.log("====== Handcrafted Evaluation ======")
+  console.log("Game FEN: ", game.fen())
   if (isEvaluatePieceCount) {
-    evaluation += evaluatePieceCount(game, customPhase)
+    const pieceCountEvaluation = evaluatePieceCount(game, customPhase)
+    console.log("Piece Count Evaluation: ", pieceCountEvaluation)
+    evaluation += pieceCountEvaluation
   }
   if (isEvaluatePiecePosition) {
-    evaluation += evaluatePiecePosition(game, customPhase)
+    const piecePositionEvaluation = evaluatePiecePosition(game, customPhase)
+    console.log("Piece Position Evaluation: ", piecePositionEvaluation)
+    evaluation += piecePositionEvaluation
   }
-  if (isEvaluateMobility) {
-    evaluation += evaluateMobility(game, customPhase)
-  }
-  if (isEvaluatePawnStructure) {
-    evaluation += evaluatePawnStructure(game, customPhase)
-  }
+  // if (isEvaluateMobility) {
+  //   const mobilityEvaluation = evaluateMobility(game, customPhase)
+  //   console.log("Mobility Evaluation: ", mobilityEvaluation)
+  //   evaluation += mobilityEvaluation
+  // }
+  // if (isEvaluatePawnStructure) {
+  //   const pawnStructureEvaluation = evaluatePawnStructure(game, customPhase)
+  //   console.log("Pawn Structure Evaluation: ", pawnStructureEvaluation)
+  //   evaluation += pawnStructureEvaluation
+  // }
+  console.log("Total Evaluation: ", evaluation)
+  console.log("===================================")
   return evaluation
 }

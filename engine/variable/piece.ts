@@ -1,3 +1,70 @@
+export const PAWN_STRUCTURE_VALUE = {
+  doubled: {
+    default: -50,
+  },
+  isolated: {
+    default: -50,
+  },
+  blocked: {
+    default: -50,
+  },
+}
+
+export const MOBILITY_VALUE = {
+  default: 10,
+}
+
+export const COLUMNS = ["a", "b", "c", "d", "e", "f", "g", "h"]
+export const COLUMN_BEFORE = {"a": null, "b": "a", "c": "b", "d": "c", "e": "d", "f": "e", "g": "f", "h": "g"}  
+export const COLUMN_AFTER = {"a": "b", "b": "c", "c": "d", "d": "e", "e": "f", "f": "g", "g": "h", "h": null}
+
+export const ROWS = [1, 2, 3, 4, 5, 6, 7, 8]
+export const ROW_BEFORE = {1: null, 2: 1, 3: 2, 4: 3, 5: 4, 6: 5, 7: 6, 8: 7}
+export const ROW_AFTER = {1: 2, 2: 3, 3: 4, 4: 5, 5: 6, 6: 7, 7: 8, 8: null}
+
+export const SQUARE_BY_ROW_COLUMN= {
+  "a": { 1: "a1", 2: "a2", 3: "a3", 4: "a4", 5: "a5", 6: "a6", 7: "a7", 8: "a8" },
+  "b": { 1: "b1", 2: "b2", 3: "b3", 4: "b4", 5: "b5", 6: "b6", 7: "b7", 8: "b8" },
+  "c": { 1: "c1", 2: "c2", 3: "c3", 4: "c4", 5: "c5", 6: "c6", 7: "c7", 8: "c8" },
+  "d": { 1: "d1", 2: "d2", 3: "d3", 4: "d4", 5: "d5", 6: "d6", 7: "d7", 8: "d8" },
+  "e": { 1: "e1", 2: "e2", 3: "e3", 4: "e4", 5: "e5", 6: "e6", 7: "e7", 8: "e8" },
+  "f": { 1: "f1", 2: "f2", 3: "f3", 4: "f4", 5: "f5", 6: "f6", 7: "f7", 8: "f8" },
+  "g": { 1: "g1", 2: "g2", 3: "g3", 4: "g4", 5: "g5", 6: "g6", 7: "g7", 8: "g8" },
+  }
+
+export const SQUARE_BY_COLUMN_ROW= {
+  1: { "a": "a1", "b": "b1", "c": "c1", "d": "d1", "e": "e1", "f": "f1", "g": "g1", "h": "h1" },
+  2: { "a": "a2", "b": "b2", "c": "c2", "d": "d2", "e": "e2", "f": "f2", "g": "g2", "h": "h2" },
+  3: { "a": "a3", "b": "b3", "c": "c3", "d": "d3", "e": "e3", "f": "f3", "g": "g3", "h": "h3" },
+  4: { "a": "a4", "b": "b4", "c": "c4", "d": "d4", "e": "e4", "f": "f4", "g": "g4", "h": "h4" },
+  5: { "a": "a5", "b": "b5", "c": "c5", "d": "d5", "e": "e5", "f": "f5", "g": "g5", "h": "h5" },
+  6: { "a": "a6", "b": "b6", "c": "c6", "d": "d6", "e": "e6", "f": "f6", "g": "g6", "h": "h6" },
+  7: { "a": "a7", "b": "b7", "c": "c7", "d": "d7", "e": "e7", "f": "f7", "g": "g7", "h": "h7" },
+  8: { "a": "a8", "b": "b8", "c": "c8", "d": "d8", "e": "e8", "f": "f8", "g": "g8", "h": "h8" },
+}
+
+export const SQUARE_ARRAY_BY_COLUMN = {
+  "a": ["a1", "a2", "a3", "a4", "a5", "a6", "a7", "a8"],
+  "b": ["b1", "b2", "b3", "b4", "b5", "b6", "b7", "b8"],
+  "c": ["c1", "c2", "c3", "c4", "c5", "c6", "c7", "c8"],
+  "d": ["d1", "d2", "d3", "d4", "d5", "d6", "d7", "d8"],
+  "e": ["e1", "e2", "e3", "e4", "e5", "e6", "e7", "e8"],
+  "f": ["f1", "f2", "f3", "f4", "f5", "f6", "f7", "f8"],
+  "g": ["g1", "g2", "g3", "g4", "g5", "g6", "g7", "g8"],
+  "h": ["h1", "h2", "h3", "h4", "h5", "h6", "h7", "h8"],
+}
+
+export const SQUARE_ARRAY_BY_ROW = {
+  1: ["a1", "b1", "c1", "d1", "e1", "f1", "g1", "h1"],
+  2: ["a2", "b2", "c2", "d2", "e2", "f2", "g2", "h2"],
+  3: ["a3", "b3", "c3", "d3", "e3", "f3", "g3", "h3"],
+  4: ["a4", "b4", "c4", "d4", "e4", "f4", "g4", "h4"],
+  5: ["a5", "b5", "c5", "d5", "e5", "f5", "g5", "h5"],
+  6: ["a6", "b6", "c6", "d6", "e6", "f6", "g6", "h6"],
+  7: ["a7", "b7", "c7", "d7", "e7", "f7", "g7", "h7"],
+  8: ["a8", "b8", "c8", "d8", "e8", "f8", "g8", "h8"],
+}
+
 export const MIRROR_BOARD = {
   "a8": "a1", "b8": "b1", "c8": "c1", "d8": "d1", "e8": "e1", "f8": "f1", "g8": "g1", "h8": "h1",
   "a7": "a2", "b7": "b2", "c7": "c2", "d7": "d2", "e7": "e2", "f7": "f2", "g7": "g2", "h7": "h2",
@@ -127,41 +194,3 @@ export const PIECE_VALUES = {
     }
 }
 
-export const PAWN_STRUCTURE_VALUE = {
-  default: {
-    doubled: -50,
-    isolated: -50,
-    backward: -50,
-    passed: 50,
-    connected: 50,
-    protected: 50,
-  },
-  opening: {
-    doubled: -50,
-    isolated: -50,
-    backward: -50,
-    passed: 50,
-    connected: 50,
-    protected: 50,
-  },
-  middlegame: {
-    doubled: -50,
-    isolated: -50,
-    backward: -50,
-    passed: 50,
-    connected: 50,
-    protected: 50,
-  },
-  endgame: {
-    doubled: -50,
-    isolated: -50,
-    backward: -50,
-    passed: 50,
-    connected: 50,
-    protected: 50,
-  }
-}
-
-export const MOBILITY_VALUE = {
-  default: 1,
-}
