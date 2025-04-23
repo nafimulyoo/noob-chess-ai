@@ -136,7 +136,7 @@ export function evaluatePawnStructure(
     evaluation += isolatedPawnEvaluation
 
     const blockedPawnEvaluation = evaluateBlockedPawns(game, customPhase)
-    console.log("- Isolated Pawn Evaluation: ", blockedPawnEvaluation)
+    console.log("- Blocked Pawn Evaluation: ", blockedPawnEvaluation)
     evaluation += blockedPawnEvaluation
 
     return evaluation
