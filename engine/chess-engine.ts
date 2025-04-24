@@ -1,39 +1,65 @@
 import { Chess } from "chess.js"
 import { GAME_SPLIT } from "./variable/game"
-import { evaluatePieceCount } from "./evaluation/functions"
+import { evaluatePieceCount, movesOrdered } from "./evaluation/functions"
 import { evaluatePiecePosition } from "./evaluation/functions"
 import { evaluateMobility } from "./evaluation/functions"
 import { evaluatePawnStructure } from "./evaluation/functions"
 
+var node = 0;
 export const Engines = [
   {
     id: "random",
-    name: "Random",
+    name: "1. Random",
     description: "A random engine that makes random moves.",
     searchAlgorithm: randomSearch,
     evaluationAlgorithm: randomEvaluation,
     evaluationBarAlgorithm: randomEvaluation,
     depthSettingAvailable: false,
+    maxDepth: 1,
     simulateThinking: true, 
   },
   {
     id: "one-depth-best-move",
-    name: "One Depth Best Move",
+    name: "2. One-Depth Best Move",
     description: "A simple naive engine that evaluates all moves and selects the best immediate one.",
     searchAlgorithm: oneDepthBestMoveSearch,
     evaluationAlgorithm: handcraftedEvaluation,
     evaluationBarAlgorithm: handcraftedEvaluation,
     depthSettingAvailable: false,
+    maxDepth: 1,
     simulateThinking: false,
   },
   {
     id: "minimax",
-    name: "Handcrafted Minimax",
+    name: "3. Handcrafted Simple Minimax",
     description: "A simple minimax engine.",
     searchAlgorithm: minimaxSearch,
     evaluationAlgorithm: handcraftedEvaluation,
     evaluationBarAlgorithm: handcraftedEvaluation,
     depthSettingAvailable: true,
+    maxDepth: 3,
+    simulateThinking: false,
+  },
+  {
+    id: "minimax-alpha-beta",
+    name: "4. Handcrafted Minimax Alpha-Beta",
+    description: "A simple minimax engine with alpha-beta pruning.",
+    searchAlgorithm: minimaxSearchAlphaBeta,
+    evaluationAlgorithm: handcraftedEvaluation,
+    evaluationBarAlgorithm: handcraftedEvaluation,
+    depthSettingAvailable: true,
+    maxDepth: 5,
+    simulateThinking: false,
+  },
+  {
+    id: "minimax-alpha-beta-move-ordering",
+    name: "5. Handcrafted Minimax Alpha-Beta with Move Ordering",
+    description: "A simple minimax engine with alpha-beta pruning and move ordering.",
+    searchAlgorithm: minimaxSearchAlphaBetaMoveOrdering,
+    evaluationAlgorithm: handcraftedEvaluation,
+    evaluationBarAlgorithm: handcraftedEvaluation,
+    depthSettingAvailable: true,
+    maxDepth: 5,
     simulateThinking: false,
   },
 ]
@@ -201,6 +227,7 @@ function oneDepthBestMoveSearch(
 }
 
 function mini(game: Chess, depth: number, evaluationAlgorithm: any) {
+  node = node + 1
   const gameCopy = new Chess(game.fen());
   if (depth === 0 || gameCopy.isGameOver()) {
     return evaluationAlgorithm(gameCopy);
@@ -219,6 +246,7 @@ function mini(game: Chess, depth: number, evaluationAlgorithm: any) {
 }
 
 function maxi(game: Chess, depth: number, evaluationAlgorithm: any) {
+  node = node + 1
   const gameCopy = new Chess(game.fen());
   if (depth === 0 || gameCopy.isGameOver()) {
     return evaluationAlgorithm(gameCopy);
@@ -230,6 +258,111 @@ function maxi(game: Chess, depth: number, evaluationAlgorithm: any) {
     const evaluation = mini(gameCopy, depth - 1, evaluationAlgorithm);
     if (evaluation > max) {
       max = evaluation;
+    }
+    gameCopy.undo();
+  }
+  return max;
+}
+
+
+function miniAlphaBeta(game: Chess, depth: number, evaluationAlgorithm: any, alpha: number, beta: number) {
+  node = node + 1
+  const gameCopy = new Chess(game.fen());
+  if (depth === 0 || gameCopy.isGameOver()) {
+    return evaluationAlgorithm(gameCopy);
+  }
+  let min = Infinity;
+  const moves = gameCopy.moves();
+  for (const move of moves) {
+    gameCopy.move(move);
+    const evaluation = maxiAlphaBeta(gameCopy, depth - 1, evaluationAlgorithm, alpha, beta);
+    if (evaluation < min) {
+      min = evaluation;
+    }
+    if (min <= beta) {
+      beta = min;
+    }
+    if (beta <= alpha) {
+      gameCopy.undo();
+      break;
+    }
+    gameCopy.undo();
+  }
+  return min;
+}
+
+function maxiAlphaBeta(game: Chess, depth: number, evaluationAlgorithm: any, alpha: number, beta: number) {
+  node = node + 1
+  const gameCopy = new Chess(game.fen());
+  if (depth === 0 || gameCopy.isGameOver()) {
+    return evaluationAlgorithm(gameCopy);
+  }
+  let max = -Infinity;
+  const moves = gameCopy.moves();
+  for (const move of moves) {
+    gameCopy.move(move);
+    const evaluation = miniAlphaBeta(gameCopy, depth - 1, evaluationAlgorithm, alpha, beta);
+    if (evaluation > max) {
+      max = evaluation;
+    }
+    if (max >= alpha) {
+      alpha = max;
+    }
+    if (alpha >= beta) {
+      gameCopy.undo();
+      break;
+    }
+    gameCopy.undo();
+  }
+  return max;
+}
+
+function miniAlphaBetaMoveOrdered(game: Chess, depth: number, evaluationAlgorithm: any, alpha: number, beta: number) {
+  node = node + 1
+  const gameCopy = new Chess(game.fen());
+  if (depth === 0 || gameCopy.isGameOver()) {
+    return evaluationAlgorithm(gameCopy);
+  }
+  let min = Infinity;
+  const moves = movesOrdered(gameCopy)
+  for (const move of moves) {
+    gameCopy.move(move);
+    const evaluation = maxiAlphaBeta(gameCopy, depth - 1, evaluationAlgorithm, alpha, beta);
+    if (evaluation < min) {
+      min = evaluation;
+    }
+    if (min <= beta) {
+      beta = min;
+    }
+    if (beta <= alpha) {
+      gameCopy.undo();
+      break;
+    }
+    gameCopy.undo();
+  }
+  return min;
+}
+
+function maxiAlphaBetaMoveOrdered(game: Chess, depth: number, evaluationAlgorithm: any, alpha: number, beta: number) {
+  node = node + 1
+  const gameCopy = new Chess(game.fen());
+  if (depth === 0 || gameCopy.isGameOver()) {
+    return evaluationAlgorithm(gameCopy);
+  }
+  let max = -Infinity;
+  const moves = movesOrdered(gameCopy)
+  for (const move of moves) {
+    gameCopy.move(move);
+    const evaluation = miniAlphaBeta(gameCopy, depth - 1, evaluationAlgorithm, alpha, beta);
+    if (evaluation > max) {
+      max = evaluation;
+    }
+    if (max >= alpha) {
+      alpha = max;
+    }
+    if (alpha >= beta) {
+      gameCopy.undo();
+      break;
     }
     gameCopy.undo();
   }
@@ -257,6 +390,7 @@ function minimaxSearch(
   depth: number,
   evaluationAlgorithm: any
 ) {
+  
 
   const moves = game.moves({ verbose: true });
   const eval_turn_multiplier = game.turn() === "w" ? 1 : -1
@@ -270,9 +404,8 @@ function minimaxSearch(
     bestMoves: []
   };
 
-  
-
   for (const move of moves) {
+    node = node + 1
     const gameCopy = new Chess(game.fen());
     const turn = gameCopy.turn()
     gameCopy.move(move.san);
@@ -310,7 +443,147 @@ function minimaxSearch(
     const randomIndex = Math.floor(Math.random() * searchResult.bestMoves.length);
     searchResult.bestMove = searchResult.bestMoves[randomIndex];
   }
+  console.log("Nodes evaluated: ", node)
+  node = 0
+  console.log("movesEvaluated by minimax", searchResult);
+  return searchResult;
+}
 
+function minimaxSearchAlphaBeta(
+  game: Chess,
+  depth: number,
+  evaluationAlgorithm: any
+) {
+
+  const moves = game.moves({ verbose: true });
+  const eval_turn_multiplier = game.turn() === "w" ? 1 : -1
+
+  let searchResult = {
+    bestMove: {
+      move: null as any,
+      evaluation: -Infinity
+    },
+    movesEvaluated: [],
+    bestMoves: []
+  };
+
+  for (const move of moves) {
+    node = node + 1
+    const gameCopy = new Chess(game.fen());
+    const turn = gameCopy.turn()
+    gameCopy.move(move.san);
+    let evaluation = 0;
+    let alpha = -Infinity;
+    let beta = Infinity;
+
+    if (turn == "b") {
+      evaluation = maxiAlphaBeta(gameCopy, depth - 1, evaluationAlgorithm, alpha, beta)*eval_turn_multiplier
+    }
+    else {
+      evaluation = miniAlphaBeta(gameCopy, depth - 1, evaluationAlgorithm, alpha, beta)*eval_turn_multiplier
+    }
+
+    const moveCopy = Object.assign({}, move);
+
+    searchResult.movesEvaluated.push({ move: moveCopy, evaluation });
+
+    // First move case
+    if (!searchResult.bestMove) {
+      searchResult.bestMove = { move: moveCopy, evaluation };
+      searchResult.bestMoves = [{ move: moveCopy, evaluation }];
+      continue;
+    }
+
+    // Found a better move
+    if (evaluation > searchResult.bestMove.evaluation) {
+      searchResult.bestMove = { move: moveCopy, evaluation };
+      searchResult.bestMoves = [{ move: moveCopy, evaluation }];
+    } 
+    // Found an equally good move
+    else if (evaluation === searchResult.bestMove.evaluation) {
+      searchResult.bestMoves.push({ move: moveCopy, evaluation });
+    }
+  }
+
+  if (searchResult.bestMoves.length > 1) {
+    const randomIndex = Math.floor(Math.random() * searchResult.bestMoves.length);
+    searchResult.bestMove = searchResult.bestMoves[randomIndex];
+  }
+  console.log("Nodes evaluated: ", node)
+  node = 0
+
+  console.log("movesEvaluated by minimax", searchResult);
+  return searchResult;
+}
+
+
+
+
+function minimaxSearchAlphaBetaMoveOrdering(
+  game: Chess,
+  depth: number,
+  evaluationAlgorithm: any
+) {
+
+  const eval_turn_multiplier = game.turn() === "w" ? 1 : -1
+
+  let searchResult = {
+    bestMove: {
+      move: null as any,
+      evaluation: -Infinity
+    },
+    movesEvaluated: [],
+    bestMoves: []
+  };
+
+  let move_order = movesOrdered(game)
+
+
+  for (const move of move_order) {
+    node = node + 1
+    const gameCopy = new Chess(game.fen());
+    const turn = gameCopy.turn()
+    gameCopy.move(move.san);
+    let evaluation = 0;
+    let alpha = -Infinity;
+    let beta = Infinity;
+
+  
+    if (turn == "b") {
+      evaluation = maxiAlphaBetaMoveOrdered(gameCopy, depth - 1, evaluationAlgorithm, alpha, beta)*eval_turn_multiplier
+    }
+    else {
+      evaluation = miniAlphaBetaMoveOrdered(gameCopy, depth - 1, evaluationAlgorithm, alpha, beta)*eval_turn_multiplier
+    }
+
+    const moveCopy = Object.assign({}, move);
+
+    searchResult.movesEvaluated.push({ move: moveCopy, evaluation });
+
+    // First move case
+    if (!searchResult.bestMove) {
+      searchResult.bestMove = { move: moveCopy, evaluation };
+      searchResult.bestMoves = [{ move: moveCopy, evaluation }];
+      continue;
+    }
+
+    // Found a better move
+    if (evaluation > searchResult.bestMove.evaluation) {
+      searchResult.bestMove = { move: moveCopy, evaluation };
+      searchResult.bestMoves = [{ move: moveCopy, evaluation }];
+    } 
+    // Found an equally good move
+    else if (evaluation === searchResult.bestMove.evaluation) {
+      searchResult.bestMoves.push({ move: moveCopy, evaluation });
+    }
+  }
+
+  if (searchResult.bestMoves.length > 1) {
+    const randomIndex = Math.floor(Math.random() * searchResult.bestMoves.length);
+    searchResult.bestMove = searchResult.bestMoves[randomIndex];
+  }
+  console.log("Nodes evaluated: ", node)
+  node = 0
   console.log("movesEvaluated by minimax", searchResult);
   return searchResult;
 }
@@ -332,29 +605,29 @@ function handcraftedEvaluation(
   }
 ) {
   let evaluation = 0
-  console.log("====== Handcrafted Evaluation ======")
-  console.log("Game FEN: ", game.fen())
+  // console.log("====== Handcrafted Evaluation ======")
+  // console.log("Game FEN: ", game.fen())
   if (isEvaluatePieceCount) {
     const pieceCountEvaluation = evaluatePieceCount(game, customPhase)
-    console.log("Piece Count Evaluation: ", pieceCountEvaluation)
+    // console.log("Piece Count Evaluation: ", pieceCountEvaluation)
     evaluation += pieceCountEvaluation
   }
   if (isEvaluatePiecePosition) {
     const piecePositionEvaluation = evaluatePiecePosition(game, customPhase)
-    console.log("Piece Position Evaluation: ", piecePositionEvaluation)
+    // console.log("Piece Position Evaluation: ", piecePositionEvaluation)
     evaluation += piecePositionEvaluation
   }
   if (isEvaluateMobility) {
     const mobilityEvaluation = evaluateMobility(game, customPhase)
-    console.log("Mobility Evaluation: ", mobilityEvaluation)
+    // console.log("Mobility Evaluation: ", mobilityEvaluation)
     evaluation += mobilityEvaluation
   }
   if (isEvaluatePawnStructure) {
     const pawnStructureEvaluation = evaluatePawnStructure(game, customPhase)
-    console.log("Pawn Structure Evaluation: ", pawnStructureEvaluation)
+    // console.log("Pawn Structure Evaluation: ", pawnStructureEvaluation)
     evaluation += pawnStructureEvaluation
   }
-  console.log("Total Evaluation: ", evaluation)
-  console.log("===================================")
+  // console.log("Total Evaluation: ", evaluation)
+  // console.log("===================================")
   return evaluation
 }

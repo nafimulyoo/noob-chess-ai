@@ -18,6 +18,57 @@ function evaluateExample(
     return evaluation
 }
 
+export function movesOrdered(
+    game: Chess
+  ) {
+    let move_order = []
+    let move_options = game.moves({ verbose: true })
+    for (const move of move_options) {
+        // console.log("Move: ", move)
+        if (move.captured) {
+            // console.log("Move is Capture: ", move)
+            const targetPiece = game.get(move.to);
+            if (targetPiece) {
+                const targetPieceValue = PIECE_VALUES[targetPiece.type].main_value['default']/100
+                const attackerPieceValue = PIECE_VALUES[move.piece].main_value['default']/100
+                move_order.push({
+                    move: move,
+                    score: 2000 + (targetPieceValue - attackerPieceValue)
+                })
+            }
+        } 
+        else if (move.san === 'O-O' || move.san === 'O-O-O') {
+            // console.log("Move is Queenside or Kingside Castle: ", move)
+            move_order.push({
+                move: move,
+                score: 550
+            })
+        }
+        else if (move.piece === 'p' && (move.to[1] === '4' || move.to[1] === '5') && (move.from[1] === '2' || move.from[1] === '7')) {
+            // console.log("Move is Big Pawn: ", move)
+            move_order.push({
+                move: move,
+                score: 100
+            })
+        }
+        else {
+            // console.log("Move is Normal: ", move)
+            move_order.push({
+                move: move,
+                score: 0
+            })
+        }
+       
+    }
+    console.log("Move Order: ", move_order)
+    // Sort the moves by score in descending order
+
+    move_order.sort((a, b) => b.score - a.score)
+    const move_ordered = move_order.map(move => move.move)
+    console.log("Move Ordered: ", move_ordered)
+    return move_ordered
+}
+
 export function evaluatePieceCount(
     game: Chess, 
     customPhase: any = {
@@ -110,7 +161,7 @@ export function evaluateMobility(
         evaluation += (whiteMoveCount - blackMoveCount) * MOBILITY_VALUE.default
     }
     catch (error) {
-        console.error("Error in mobility evaluation: ", error)
+        
     }
 
     return evaluation
@@ -128,15 +179,15 @@ export function evaluatePawnStructure(
     let evaluation = 0
 
     const doubledPawnEvaluation = evaluateDoubledPawns(game, customPhase)
-    console.log("- Doubled Pawn Evaluation: ", doubledPawnEvaluation)
+    // console.log("- Doubled Pawn Evaluation: ", doubledPawnEvaluation)
     evaluation += doubledPawnEvaluation
 
     const isolatedPawnEvaluation = evaluateIsolatedPawns(game, customPhase)
-    console.log("- Isolated Pawn Evaluation: ", isolatedPawnEvaluation)
+    // console.log("- Isolated Pawn Evaluation: ", isolatedPawnEvaluation)
     evaluation += isolatedPawnEvaluation
 
     const blockedPawnEvaluation = evaluateBlockedPawns(game, customPhase)
-    console.log("- Blocked Pawn Evaluation: ", blockedPawnEvaluation)
+    // console.log("- Blocked Pawn Evaluation: ", blockedPawnEvaluation)
     evaluation += blockedPawnEvaluation
 
     return evaluation
@@ -180,7 +231,7 @@ export function evaluateDoubledPawns(
             blackDoubledPawns += blackPawnCount - 1
         }
     }
-    console.log("- Doubled Pawns Black: ", blackDoubledPawns, "Doubled Pawns White: ", whiteDoubledPawns)
+    // console.log("- Doubled Pawns Black: ", blackDoubledPawns, "Doubled Pawns White: ", whiteDoubledPawns)
     evaluation += (whiteDoubledPawns - blackDoubledPawns) * PAWN_STRUCTURE_VALUE.doubled.default
 
     return evaluation

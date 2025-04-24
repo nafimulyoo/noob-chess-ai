@@ -28,7 +28,7 @@ export default function ChessInterface() {
   const [moveHistory, setMoveHistory] = useState<string[]>([])
   const [currentMoveIndex, setCurrentMoveIndex] = useState(-1)
   const [evaluation, setEvaluation] = useState(0)
-  const [selectedEngine, setSelectedEngine] = useState("minimax")
+  const [selectedEngine, setSelectedEngine] = useState("minimax-alpha-beta-move-ordering")
   const [depth, setDepth] = useState(3)
   const [Engine, setEngine] = useState<ChessEngine>(new ChessEngine(selectedEngine, depth))
   const [showGameOverModal, setShowGameOverModal] = useState(false)
@@ -535,7 +535,7 @@ export default function ChessInterface() {
                 Engines.find(e => e.id === selectedEngine)?.depthSettingAvailable ? (
                   <div>
                     <label className="block text-sm font-medium my-2">Search Depth: {depth}</label>
-                    <Slider value={[depth]} min={1} max={3} step={1} onValueChange={(value) => setDepth(value[0])} />
+                    <Slider value={[depth]} min={1} max={Engines.find((e) => e.id === selectedEngine)?.maxDepth} step={1} onValueChange={(value) => setDepth(value[0])} />
                   </div>
                 ) : (
                   <label className="block text-sm font-medium mb-1">Search Depth is Not Adjustable</label>

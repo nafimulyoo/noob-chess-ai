@@ -56,7 +56,6 @@ export default function MoveHistory({ moves, currentMoveIndex, onSelectMove, chi
     </div>
       <div className="p-2 flex justify-between w-full">
         {children}
-       
       </div>
     </div>
   )
